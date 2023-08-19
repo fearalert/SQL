@@ -1,0 +1,211 @@
+CREATE DATABASE assignment;
+
+USE assignment;
+
+CREATE TABLE Company
+(
+  CompanyID INT NOT NULL,
+  Address VARCHAR(40) NOT NULL,
+  Website VARCHAR(40) NOT NULL,
+  PRIMARY KEY (CompanyID)
+);
+
+CREATE TABLE CompanyPhone
+(
+  Phone BIGINT NOT NULL,
+  CompanyID INT NOT NULL,
+  PRIMARY KEY (Phone, CompanyID),
+  FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+);
+
+CREATE TABLE Transactions
+(
+  TransactionID INT NOT NULL,
+  Method VARCHAR(40) NOT NULL,
+  Amount INT NOT NULL,
+  Dues INT NOT NULL,
+  AuthorID INT NOT NULL,
+  CompanyID INT NOT NULL,
+  PRIMARY KEY (TransactionID, AuthorID, CompanyID),
+  FOREIGN KEY (AuthorID) REFERENCES Author(AuthorID),
+  FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+);
+
+CREATE TABLE Author
+(
+	AuthorID INT NOT NULL,
+    `Name` VARCHAR(40) NOT NULL,
+    DOB VARCHAR(40) NOT NULL,
+    Nationality VARCHAR(40) NOT NULL,
+    Gender VARCHAR(40),
+    PRIMARY KEY (AuthorID)
+);
+
+CREATE TABLE Books
+(
+  ISBN BIGINT NOT NULL,
+  Title VARCHAR(60) NOT NULL,
+  Genre VARCHAR(40),
+  Edition VARCHAR(40) NOT NULL,
+  Price INT NOT NULL,
+  PRIMARY KEY (ISBN)
+);
+
+CREATE TABLE AuthoredBy
+(
+  AuthorID INT NOT NULL,
+  ISBN BIGINT NOT NULL,
+  PRIMARY KEY (AuthorID, ISBN),
+  FOREIGN KEY (AuthorID) REFERENCES Author(AuthorID),
+  FOREIGN KEY (ISBN) REFERENCES Books(ISBN)
+);
+
+CREATE TABLE Magazine
+(
+  MagazineID INT NOT NULL,
+  Title VARCHAR(60) NOT NULL,
+  Genre VARCHAR(40),
+  PublishPeriod VARCHAR(40) NOT NULL,
+  Price INT NOT NULL,
+  PRIMARY KEY (MagazineID)
+);
+
+CREATE TABLE BookPrint
+(
+  ISBN BIGINT NOT NULL,
+  PrintID INT NOT NULL,
+  PRIMARY KEY (ISBN, PrintID),
+  FOREIGN KEY (ISBN) REFERENCES Books(ISBN),
+  FOREIGN KEY (PrintID) REFERENCES Prints(PrintID)
+);
+
+CREATE TABLE MagazinePrint
+(
+  MagazineID INT NOT NULL,
+  PrintID INT NOT NULL,
+  PRIMARY KEY (MagazineID, PrintID),
+  FOREIGN KEY (MagazineID) REFERENCES Magazine(MagazineID),
+  FOREIGN KEY (PrintID) REFERENCES Prints(PrintID)
+);
+
+CREATE TABLE Prints
+(
+  Quantity BIGINT NOT NULL,
+  PrintDate VARCHAR(40) NOT NULL,
+  PrintID INT NOT NULL,
+  CompanyID INT NOT NULL,
+  PRIMARY KEY (PrintID, CompanyID),
+  FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+);
+
+CREATE TABLE Orders
+(
+  orderNumber INT NOT NULL,
+  TotalAmount INT NOT NULL,
+  `Status` VARCHAR(40) NOT NULL,
+  PANID BIGINT NOT NULL,
+  PRIMARY KEY (orderNumber),
+  FOREIGN KEY (PANID) REFERENCES Distributor(PANID)
+);
+
+ALTER TABLE Orders ADD COLUMN Discount INT;
+ALTER TABLE Orders ADD COLUMN BooksQuantity INT;
+ALTER TABLE Orders ADD COLUMN MagazineQuantity INT;
+ALTER TABLE Orders ADD COLUMN `Date` VARCHAR(20);
+
+CREATE TABLE bookOrder(
+ID INT NOT NULL,
+orderNumber INT NOT NULL,
+ISBN BIGINT NOT NULL,
+PRIMARY KEY(ID),
+FOREIGN KEY (orderNumber) REFERENCES Orders(orderNumber),
+FOREIGN KEY (ISBN) REFERENCES Books(ISBN)
+);
+
+CREATE TABLE magazineOrder(
+ID INT NOT NULL,
+orderNumber INT NOT NULL,
+MagazineID INT NOT NULL,
+PRIMARY KEY(ID),
+FOREIGN KEY (orderNumber) REFERENCES Orders(orderNumber),
+FOREIGN KEY (magazineID) REFERENCES Magazine(MagazineID)
+);
+
+CREATE TABLE Orderpayment
+(
+  PaymentID INT NOT NULL,
+  Dues INT NOT NULL,
+  PaidAmount INT,
+  `History` VARCHAR(40) NOT NULL,
+  VATDetails INT NOT NULL,
+  Discount INT NOT NULL,
+  TotalAmount INT NOT NULL,
+  PANID BIGINT NOT NULL,
+  orderNumber INT NOT NULL,
+  PRIMARY KEY (PaymentID, PANID, orderNumber),
+  FOREIGN KEY (PANID) REFERENCES Distributor(PANID),
+  FOREIGN KEY (orderNumber) REFERENCES Orders(orderNumber)
+);
+
+CREATE TABLE Distributor
+(
+  PANID BIGINT NOT NULL,
+  `Name` VARCHAR(40) NOT NULL,
+  Website VARCHAR(40) NOT NULL,
+  Location VARCHAR(40) NOT NULL,
+  PRIMARY KEY (PANID)
+);
+
+CREATE TABLE DistributorPhone
+(
+  Phone BIGINT NOT NULL,
+  PANID BIGINT NOT NULL,
+  PRIMARY KEY (Phone, PANID),
+  FOREIGN KEY (PANID) REFERENCES Distributor(PANID)
+);
+
+CREATE TABLE Distributes
+(
+  SalesID INT NOT NULL,
+  PANID BIGINT NOT NULL,
+  PRIMARY KEY (SalesID, PANID),
+  FOREIGN KEY (SalesID) REFERENCES Sales(SalesID),
+  FOREIGN KEY (PANID) REFERENCES Distributor(PANID)
+);
+
+CREATE TABLE Sales
+(
+  SalesID INT NOT NULL,
+  TotalAmount INT NOT NULL,
+  TotalOrders INT NOT NULL,
+  Dues INT NOT NULL,
+  PRIMARY KEY (SalesID)
+);
+
+ALTER TABLE Sales ADD COLUMN `Date` VARCHAR(20);
+ALTER TABLE Sales ADD COLUMN `Time` VARCHAR(20);
+
+CREATE TABLE Requests
+(
+  SalesID INT NOT NULL,
+  StoreID INT NOT NULL,
+  PRIMARY KEY (SalesID, StoreID),
+  FOREIGN KEY (SalesID) REFERENCES Sales(SalesID),
+  FOREIGN KEY (StoreID) REFERENCES Stores(StoreID)
+);
+
+CREATE TABLE Stores
+(
+  storeName VARCHAR(40) NOT NULL,
+  Address VARCHAR(40) NOT NULL,
+  StoreID INT NOT NULL,
+  PRIMARY KEY (StoreID)
+);
+
+CREATE TABLE StoresPhone
+(
+  Phone BIGINT NOT NULL,
+  StoreID INT NOT NULL,
+  PRIMARY KEY (Phone, StoreID),
+  FOREIGN KEY (StoreID) REFERENCES Stores(StoreID)
+);
